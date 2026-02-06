@@ -25,27 +25,10 @@ class NoteManager {
         var id = 0
         var beatTime = 2f // 2초 후부터 시작 (준비 시간)
         
-        // 간단한 패턴 생성 (MVP용)
+        // TAP 노트만 생성 (MVP용)
         while (beatTime < duration - 1f) {
-            // 기본 탭 노트
             notes.add(Note(id++, NoteType.TAP, beatTime))
             beatTime += beatInterval
-            
-            // 가끔 홀드 노트 추가 (4비트마다)
-            if (id % 8 == 0 && beatTime < duration - 2f) {
-                notes.add(Note(id++, NoteType.HOLD, beatTime))
-                beatTime += beatInterval * 2 // 홀드는 2박자
-            }
-            
-            // 가끔 스와이프 노트 추가 (랜덤)
-            if (id % 6 == 0 && beatTime < duration - 1f) {
-                val swipeType = if (id % 2 == 0) 
-                    NoteType.SWIPE_LEFT 
-                else 
-                    NoteType.SWIPE_RIGHT
-                notes.add(Note(id++, swipeType, beatTime))
-                beatTime += beatInterval
-            }
         }
         
         return notes
