@@ -1,122 +1,122 @@
-# 🍞 Bakery Rhythm - Project Context
+# 🍞 Bakery Rhythm - 프로젝트 컨텍스트
 
-This file gives Cursor full context about the game project.
-
----
-
-# Project Goal
-
-Build and release a small Android mobile game on Google Play.
-
-This is a solo indie project.
-Scope must stay MVP and shippable.
+이 파일은 Cursor에게 게임 프로젝트에 대한 전체 컨텍스트를 제공합니다.
 
 ---
 
-# Game Summary
+# 프로젝트 목표
 
-Bakery Rhythm is a **cute casual rhythm + tycoon mobile game**.
+Android 모바일 게임을 개발하여 Google Play에 출시하기.
 
-Player runs a small bakery and earns money by playing a short rhythm mini game to bake bread.
-
-Money is used to buy upgrades that increase earnings.
-
-The game is **fully active**:
-Player only earns money by playing the rhythm game.
+1인 인디 프로젝트입니다.
+범위는 MVP로 유지하며 출시 가능한 수준을 목표로 합니다.
 
 ---
 
-# Target Platform
+# 게임 요약
+
+Bakery Rhythm은 **귀엽고 캐주얼한 리듬 + 타이쿤 모바일 게임**입니다.
+
+플레이어는 작은 베이커리를 운영하며, 짧은 리듬 미니게임을 플레이하여 빵을 굽고 돈을 벌게 됩니다.
+
+벌어들인 돈은 수익을 증가시키는 업그레이드 구매에 사용됩니다.
+
+게임은 **완전 능동형**입니다:
+플레이어는 리듬 게임을 플레이할 때만 돈을 벌 수 있습니다.
+
+---
+
+# 타겟 플랫폼
 
 Android (Jetpack Compose)
 
-Offline game.
-No backend.
-No login.
-No multiplayer.
+오프라인 게임.
+백엔드 없음.
+로그인 없음.
+멀티플레이 없음.
 
 ---
 
-# Game Pillars
+# 게임 핵심 가치
 
-1. Cozy and relaxing
-2. Short play sessions (20–30 seconds)
-3. Simple but satisfying progression
-4. Minimal scope MVP
-
----
-
-# MVP Scope
-
-The first release MUST only include:
-
-### Screens
-1. Main_Bakery
-2. Rhythm_Game
-3. Result
-
-No extra screens.
+1. 아늑하고 편안함
+2. 짧은 플레이 세션 (20~30초)
+3. 단순하지만 만족스러운 성장
+4. 최소한의 MVP 범위
 
 ---
 
-# Core Game Loop
+# MVP 범위
 
-1. Player taps "Start Baking"
-2. Rhythm mini game starts
-3. Player plays for ~25 seconds
-4. Bread quality calculated from accuracy
-5. Coins rewarded
-6. Player buys upgrades
-7. Repeat
+첫 출시에는 반드시 다음만 포함:
 
-Player earns **zero coins while idle**.
+### 화면
+1. Main_Bakery (메인 베이커리)
+2. Rhythm_Game (리듬 게임)
+3. Result (결과)
 
----
-
-# Theme
-
-Cute animal bakery.
-Friendly and cozy vibe.
-No stress / no failure game over.
-
-Main character: Bear baker.
+추가 화면 없음.
 
 ---
 
-# Rhythm Mini Game Spec
+# 핵심 게임 루프
+
+1. 플레이어가 "빵 굽기 시작" 탭
+2. 리듬 미니게임 시작
+3. 플레이어가 약 25초간 플레이
+4. 정확도로부터 빵 품질 계산
+5. 코인 보상
+6. 플레이어가 업그레이드 구매
+7. 반복
+
+플레이어는 **대기 중에는 코인을 벌 수 없습니다**.
+
+---
+
+# 테마
+
+귀여운 동물 베이커리.
+친근하고 아늑한 분위기.
+스트레스 없음 / 게임 오버 실패 없음.
+
+주인공: 곰 베이커.
+
+---
+
+# 리듬 미니게임 스펙
 
 ### BPM
 120 BPM
 
-### Duration
-25 seconds
+### 길이
+25초
 
-### Lane
-Single vertical lane.
+### 레인
+단일 수직 레인.
 
-### Note Types
-- Tap
-- Hold
-- Swipe (left / right)
+### 노트 타입
+- Tap (탭)
+- Hold (홀드)
+- Swipe (스와이프 - 좌/우)
 
-### Judgement Windows
+### 판정 범위
 Perfect: ±80ms  
 Good: ±160ms  
-Miss: otherwise
+Miss: 그 외
 
-### Score Values
+### 점수 값
 Perfect = 100  
 Good = 50  
 Miss = 0
 
-### Accuracy Formula
+### 정확도 공식
 accuracy = earnedScore / maxScore
 
 ---
 
-# Bread Quality
+# 빵 품질
 
-Accuracy → price multiplier
+정확도 → 가격 배율
 
 95–100% → x1.5  
 80–94% → x1.2  
@@ -125,60 +125,60 @@ Accuracy → price multiplier
 
 ---
 
-# Economy (Initial Values)
+# 경제 (초기 값)
 
-Base bread price = 100 coins  
-Session length = 25 sec
-
----
-
-# Upgrades (MVP only)
-
-### 1. Recipe Upgrade
-Increase bread base price +10%
-
-### 2. Better Oven
-Increase Perfect judgement window
-
-### 3. Bigger Oven
-Increase breads per play (1 → 5)
+기본 빵 가격 = 100 코인  
+세션 길이 = 25초
 
 ---
 
-# UI Screens
+# 업그레이드 (MVP만)
+
+### 1. 레시피 업그레이드
+빵 기본 가격 +10% 증가
+
+### 2. 좋은 오븐
+Perfect 판정 범위 증가
+
+### 3. 대형 오븐
+플레이당 빵 개수 증가 (1 → 5)
+
+---
+
+# UI 화면
 
 ## Main_Bakery
-Top: Money HUD  
-Center: Kitchen stage (character area)  
-Primary button: "Start Baking"  
-Bottom: 3 upgrade buttons
+상단: 돈 HUD  
+중앙: 주방 스테이지 (캐릭터 영역)  
+주요 버튼: "빵 굽기 시작"  
+하단: 3개의 업그레이드 버튼
 
 ![Main Bakery.png](img/Main%20Bakery.png)
 
 ## Rhythm_Game
-Top: Progress bar + timer  
-Center: Note lane + judgement line  
-Bottom: Score + Combo  
-Show judgement text (Perfect / Good / Miss)
+상단: 진행 바 + 타이머  
+중앙: 노트 레인 + 판정선  
+하단: 점수 + 콤보  
+판정 텍스트 표시 (Perfect / Good / Miss)
 
 ![Mobile Rhythm Game Play Screen.png](img/Mobile%20Rhythm%20Game%20Play%20Screen.png)
 
 ## Result
-Title: Baking Result  
-Show: Accuracy %, Coins Earned  
-Buttons:
-- Play Again
-- Back to Bakery
+제목: 베이킹 결과  
+표시: 정확도 %, 획득 코인  
+버튼:
+- 다시 플레이
+- 베이커리로 돌아가기
 
 ![Game Result Screen.png](img/Game%20Result%20Screen.png)
 
 ---
 
-# Tech Stack
+# 기술 스택
 
 Android
 Kotlin
 Jetpack Compose
-Single module app (for now)
+단일 모듈 앱 (현재)
 
-Architecture to be decided next.
+아키텍처는 다음에 결정.
