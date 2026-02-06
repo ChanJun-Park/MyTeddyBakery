@@ -40,6 +40,7 @@ app/src/main/java/com/my/teddy/bakery/
 - [아키텍처 설계](docs/architecture.md) - 상세 아키텍처 문서
 - [GDD](docs/GDD.md) - 게임 디자인 문서
 - [리듬 시스템](docs/rhythm-system.md) - 리듬 게임 시스템 상세
+- [리듬 게임 구현](docs/rhythm-game-implementation.md) - 구현 완료 문서 ✨
 
 ## 🎯 MVP 범위
 
@@ -74,13 +75,18 @@ git clone [repository-url]
 - [x] 프로젝트 초기 설정
 - [x] Hilt 의존성 주입 설정
 - [x] 아키텍처 문서 작성
-- [ ] 디렉토리 구조 생성
-- [ ] 데이터 모델 구현
-- [ ] 리듬 엔진 구현
-- [ ] UI 화면 구현
-- [ ] 게임 로직 통합
+- [x] 디렉토리 구조 생성
+- [x] 데이터 모델 구현
+- [x] 리듬 엔진 구현
+- [x] UI 화면 구현 (3개 화면)
+- [x] 게임 로직 통합
+- [x] 리듬 게임 플레이 가능
+- [ ] 사운드 추가
+- [ ] 애니메이션 개선
 - [ ] 테스트 작성
 - [ ] 출시 준비
+
+**현재 상태: 플레이 가능한 프로토타입 완성 (MVP 85%)**
 
 ## 👤 개발자
 

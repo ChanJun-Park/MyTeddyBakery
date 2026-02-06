@@ -1,28 +1,15 @@
 package com.my.teddy.bakery.ui.screens.rhythm
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.my.teddy.bakery.game.rhythm.models.Judgement
+import com.my.teddy.bakery.ui.screens.rhythm.components.*
 
 /**
  * 리듬 게임 화면
@@ -52,7 +39,7 @@ fun RhythmGameScreen(
                 0f
             }
             
-            // 임시로 계산된 코인 (실제로는 ViewModel에서 계산됨)
+            // ViewModel에서 계산된 코인 사용
             val coinsEarned = (uiState.score * 1.5).toInt()
             
             onGameComplete(accuracy, coinsEarned)
@@ -64,105 +51,58 @@ fun RhythmGameScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 진행 상황
-            LinearProgressIndicator(
-                progress = { uiState.currentTime / 25f },
-                modifier = Modifier.fillMaxWidth(),
+            // 상단: 진행 상황 바
+            GameProgressBar(
+                currentTime = uiState.currentTime,
+                totalTime = 25f,
+                modifier = Modifier.padding(16.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // 점수 및 콤보 표시
+            ScoreDisplay(
+                score = uiState.score,
+                combo = uiState.combo,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // 시간 표시
-            Text(
-                text = "시간: ${uiState.currentTime.toInt()}초",
-                style = MaterialTheme.typography.titleMedium
+            // 중앙: 판정 표시
+            JudgementDisplay(
+                judgement = uiState.judgement,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
             
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            // 노트 레인 영역 (임시)
-            Card(
+            // 노트 레인 (가장 중요한 영역)
+            NoteLane(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "♪",
-                            style = MaterialTheme.typography.displayLarge
-                        )
-                        
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        // 판정 표시
-                        uiState.judgement?.let { judgement ->
-                            Text(
-                                text = when (judgement) {
-                                    Judgement.PERFECT -> "PERFECT!"
-                                    Judgement.GOOD -> "GOOD"
-                                    Judgement.MISS -> "MISS"
-                                },
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = when (judgement) {
-                                    Judgement.PERFECT -> MaterialTheme.colorScheme.primary
-                                    Judgement.GOOD -> MaterialTheme.colorScheme.secondary
-                                    Judgement.MISS -> MaterialTheme.colorScheme.error
-                                }
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.height(32.dp))
-                        
-                        Text(
-                            text = "활성 노트: ${uiState.notes.size}개",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    .padding(horizontal = 16.dp),
+                notes = uiState.notes,
+                currentTime = uiState.currentTime,
+                onNoteTap = { note ->
+                    viewModel.onNoteTap(note)
+                },
+                onNoteSwipe = { note, direction ->
+                    viewModel.onNoteTap(note) // 임시로 탭과 동일하게 처리
                 }
-            }
+            )
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // 점수 표시
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = "점수: ${uiState.score}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = "콤보: ${uiState.combo}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = "P: ${uiState.perfectCount}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "G: ${uiState.goodCount}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "M: ${uiState.missCount}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
+            // 하단: 판정 카운트
+            JudgementCountDisplay(
+                perfectCount = uiState.perfectCount,
+                goodCount = uiState.goodCount,
+                missCount = uiState.missCount,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.my.teddy.bakery.ui.screens.rhythm
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.my.teddy.bakery.data.model.RhythmResult
@@ -120,8 +121,24 @@ class RhythmViewModel @Inject constructor(
         val currentTime = rhythmEngine.getCurrentTime() * 1000 // 초 -> ms
         val noteTime = note.time * 1000
         
+        Log.d("RhythmViewModel", "노트 입력: id=${note.id}, 현재=${currentTime}ms, 노트=${noteTime}ms, 차이=${kotlin.math.abs(currentTime - noteTime)}ms")
+        
         val judgement = judgementSystem.judge(currentTime, noteTime)
+        Log.d("RhythmViewModel", "판정 결과: $judgement")
+        
         rhythmEngine.processNote(note.id, judgement)
+        
+        // 즉시 UI 업데이트
+        _uiState.update { state ->
+            state.copy(judgement = judgement)
+        }
+    }
+    
+    /**
+     * 판정 텍스트 초기화 (애니메이션 후)
+     */
+    fun clearJudgement() {
+        _uiState.update { it.copy(judgement = null) }
     }
     
     /**

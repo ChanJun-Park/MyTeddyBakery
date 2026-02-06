@@ -53,12 +53,30 @@ class RhythmEngine(
         // 활성 노트 업데이트
         updateActiveNotes()
         
+        // Miss 자동 판정 (노트가 판정선을 지나갔을 때)
+        checkMissedNotes()
+        
         currentState = currentState.copy(
             currentTime = currentTime,
             notes = activeNotes
         )
         
         return currentState
+    }
+    
+    /**
+     * Miss된 노트 자동 체크
+     * 판정선을 지나간 노트들을 Miss 처리
+     */
+    private fun checkMissedNotes() {
+        val missWindow = 0.2f // 200ms 허용 범위
+        
+        allNotes.filter { note ->
+            !processedNoteIds.contains(note.id) &&
+            (currentTime - note.time) > missWindow
+        }.forEach { note ->
+            processNote(note.id, Judgement.MISS)
+        }
     }
     
     /**
