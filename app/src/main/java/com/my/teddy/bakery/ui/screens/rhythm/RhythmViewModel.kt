@@ -23,14 +23,24 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
+ * 판정 이벤트 (타임스탬프 포함)
+ * 같은 판정이 연속으로 나와도 애니메이션이 재생되도록 함
+ */
+data class JudgementEvent(
+    val judgement: Judgement,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
+/**
  * 리듬 게임 화면의 UI 상태
+ * 
+ * currentTime은 별도 StateFlow로 관리하여 불필요한 객체 생성 방지
  */
 data class RhythmUiState(
     val notes: List<Note> = emptyList(),
-    val currentTime: Float = 0f,
     val score: Int = 0,
     val combo: Int = 0,
-    val judgement: Judgement? = null,
+    val judgementEvent: JudgementEvent? = null,
     val isPlaying: Boolean = false,
     val isGameComplete: Boolean = false,
     val perfectCount: Int = 0,
@@ -51,8 +61,13 @@ class RhythmViewModel @Inject constructor(
     private val breadPriceCalculator: BreadPriceCalculator
 ) : ViewModel() {
     
+    // 게임 상태 (변경이 적음)
     private val _uiState = MutableStateFlow(RhythmUiState())
     val uiState: StateFlow<RhythmUiState> = _uiState.asStateFlow()
+    
+    // 현재 시간 (매 프레임 변경, 별도 관리)
+    private val _currentTime = MutableStateFlow(0f)
+    val currentTime: StateFlow<Float> = _currentTime.asStateFlow()
     
     /**
      * 게임 시작
@@ -78,6 +93,9 @@ class RhythmViewModel @Inject constructor(
     
     /**
      * 게임 루프 실행
+     * 
+     * currentTime은 매 프레임 업데이트하지만,
+     * uiState는 실제 변경이 있을 때만 업데이트
      */
     private suspend fun runGameLoop() {
         var lastTime = System.currentTimeMillis()
@@ -90,18 +108,35 @@ class RhythmViewModel @Inject constructor(
             // 엔진 업데이트
             val state = rhythmEngine.update(deltaTime)
             
-            _uiState.update {
-                it.copy(
-                    currentTime = state.currentTime,
-                    notes = state.notes,
-                    score = state.score,
-                    combo = state.combo,
-                    perfectCount = state.perfectCount,
-                    goodCount = state.goodCount,
-                    missCount = state.missCount,
-                    judgement = state.lastJudgement,
-                    isPlaying = state.isPlaying
-                )
+            // 시간만 업데이트 (매 프레임, 빠름)
+            _currentTime.value = state.currentTime
+            
+            // 게임 상태는 변경이 있을 때만 업데이트 (최적화)
+            val hasStateChange = 
+                state.notes != _uiState.value.notes ||
+                state.score != _uiState.value.score ||
+                state.combo != _uiState.value.combo ||
+                state.perfectCount != _uiState.value.perfectCount ||
+                state.goodCount != _uiState.value.goodCount ||
+                state.missCount != _uiState.value.missCount ||
+                state.lastJudgement != null ||  // 판정이 발생하면 항상 업데이트
+                state.isPlaying != _uiState.value.isPlaying
+            
+            if (hasStateChange) {
+                _uiState.update {
+                    it.copy(
+                        notes = state.notes,
+                        score = state.score,
+                        combo = state.combo,
+                        perfectCount = state.perfectCount,
+                        goodCount = state.goodCount,
+                        missCount = state.missCount,
+                        judgementEvent = state.lastJudgement?.let { judgement ->
+                            JudgementEvent(judgement)
+                        },
+                        isPlaying = state.isPlaying
+                    )
+                }
             }
             
             // 게임 종료 체크
@@ -127,18 +162,6 @@ class RhythmViewModel @Inject constructor(
         Log.d("RhythmViewModel", "판정 결과: $judgement")
         
         rhythmEngine.processNote(note.id, judgement)
-        
-        // 즉시 UI 업데이트
-        _uiState.update { state ->
-            state.copy(judgement = judgement)
-        }
-    }
-    
-    /**
-     * 판정 텍스트 초기화 (애니메이션 후)
-     */
-    fun clearJudgement() {
-        _uiState.update { it.copy(judgement = null) }
     }
     
     /**

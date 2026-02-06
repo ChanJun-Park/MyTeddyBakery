@@ -22,6 +22,7 @@ fun RhythmGameScreen(
     viewModel: RhythmViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentTime by viewModel.currentTime.collectAsStateWithLifecycle()
     
     // 게임 시작
     LaunchedEffect(Unit) {
@@ -54,7 +55,7 @@ fun RhythmGameScreen(
         ) {
             // 상단: 진행 상황 바
             GameProgressBar(
-                currentTime = uiState.currentTime,
+                currentTime = currentTime,
                 totalTime = 25f,
                 modifier = Modifier.padding(16.dp)
             )
@@ -72,7 +73,7 @@ fun RhythmGameScreen(
             
             // 중앙: 판정 표시
             JudgementDisplay(
-                judgement = uiState.judgement,
+                judgementEvent = uiState.judgementEvent,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             
@@ -83,7 +84,7 @@ fun RhythmGameScreen(
                     .weight(1f)
                     .padding(horizontal = 16.dp),
                 notes = uiState.notes,
-                currentTime = uiState.currentTime,
+                currentTime = currentTime,
                 onNoteTap = { note ->
                     viewModel.onNoteTap(note)
                 },
