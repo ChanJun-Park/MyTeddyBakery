@@ -45,7 +45,8 @@ data class RhythmUiState(
     val isGameComplete: Boolean = false,
     val perfectCount: Int = 0,
     val goodCount: Int = 0,
-    val missCount: Int = 0
+    val missCount: Int = 0,
+    val coinsEarned: Int = 0,
 )
 
 /**
@@ -204,7 +205,7 @@ class RhythmViewModel @Inject constructor(
         repository.saveRhythmResult(result)
         
         _uiState.update {
-            it.copy(isGameComplete = true)
+            it.copy(isGameComplete = true, coinsEarned = coinsEarned)
         }
     }
     
