@@ -1,8 +1,8 @@
-# 🏗️ Bakery Rhythm - 아키텍처 설계
+# 🏗️ MyTeddyBakery - 아키텍처 설계
 
 ## 개요
 
-이 문서는 Android용 캐주얼 리듬-타이쿤 모바일 게임인 Bakery Rhythm의 아키텍처를 정의합니다.
+이 문서는 Android용 캐주얼 리듬-타이쿤 모바일 게임인 MyTeddyBakery의 아키텍처를 정의합니다.
 
 **아키텍처 패턴**: 간소화된 MVVM + 게임 로직 레이어
 
@@ -442,46 +442,121 @@ data class RhythmResult(
 
 ### 전략
 
-MVP에서는 **수동 의존성 주입** 사용 (Hilt/Koin 없음).
+**Hilt**를 사용하여 의존성 주입을 관리합니다.
 
-3개 화면에는 간단하고 충분합니다.
+Hilt는 Dagger 기반의 Android용 DI 라이브러리로, 보일러플레이트 코드를 줄이고 컴파일 타임에 의존성을 검증합니다.
 
+### 설정
+
+**Application 클래스**
 ```kotlin
-// Application 클래스
-class BakeryRhythmApp : Application() {
-    lateinit var repository: GameDataRepository
-        private set
-    
-    override fun onCreate() {
-        super.onCreate()
-        
-        val dataStore = GameDataStore(this)
-        repository = GameDataRepository(dataStore)
-    }
-}
+@HiltAndroidApp
+class MyTeddyBakeryApp : Application()
+```
 
-// ViewModel Factory
-class ViewModelFactory(
-    private val repository: GameDataRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return when {
-            modelClass.isAssignableFrom(BakeryViewModel::class.java) -> {
-                BakeryViewModel(repository) as T
+**Activity에 주입**
+```kotlin
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MyTeddyBakeryTheme {
+                NavGraph()
             }
-            modelClass.isAssignableFrom(RhythmViewModel::class.java) -> {
-                RhythmViewModel(repository) as T
-            }
-            modelClass.isAssignableFrom(ResultViewModel::class.java) -> {
-                ResultViewModel(repository) as T
-            }
-            else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }
 ```
 
-**참고**: 프로젝트가 MVP를 넘어 성장하면 Hilt로 마이그레이션.
+**Module 정의**
+```kotlin
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule {
+    
+    @Provides
+    @Singleton
+    fun provideGameDataStore(
+        @ApplicationContext context: Context
+    ): GameDataStore {
+        return GameDataStore(context)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideGameDataRepository(
+        dataStore: GameDataStore
+    ): GameDataRepository {
+        return GameDataRepository(dataStore)
+    }
+    
+    @Provides
+    fun provideRhythmEngine(): RhythmEngine {
+        return RhythmEngine()
+    }
+    
+    @Provides
+    fun provideJudgementSystem(): JudgementSystem {
+        return JudgementSystem()
+    }
+    
+    @Provides
+    fun provideScoreCalculator(): ScoreCalculator {
+        return ScoreCalculator()
+    }
+    
+    @Provides
+    fun provideBreadPriceCalculator(): BreadPriceCalculator {
+        return BreadPriceCalculator()
+    }
+    
+    @Provides
+    fun provideUpgradeManager(): UpgradeManager {
+        return UpgradeManager()
+    }
+}
+```
+
+**ViewModel 정의**
+```kotlin
+@HiltViewModel
+class BakeryViewModel @Inject constructor(
+    private val repository: GameDataRepository,
+    private val upgradeManager: UpgradeManager
+) : ViewModel() {
+    // ...
+}
+
+@HiltViewModel
+class RhythmViewModel @Inject constructor(
+    private val repository: GameDataRepository,
+    private val rhythmEngine: RhythmEngine,
+    private val judgementSystem: JudgementSystem,
+    private val scoreCalculator: ScoreCalculator
+) : ViewModel() {
+    // ...
+}
+
+@HiltViewModel
+class ResultViewModel @Inject constructor(
+    private val repository: GameDataRepository,
+    private val breadPriceCalculator: BreadPriceCalculator
+) : ViewModel() {
+    // ...
+}
+```
+
+**Composable에서 사용**
+```kotlin
+@Composable
+fun BakeryScreen(
+    viewModel: BakeryViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    // UI 구현
+}
+```
 
 ---
 
@@ -655,7 +730,7 @@ app/src/main/java/com/my/teddy/bakery/
 ├── di/
 │   └── ViewModelFactory.kt
 │
-├── BakeryRhythmApp.kt
+├── MyTeddyBakeryApp.kt
 └── MainActivity.kt
 ```
 
