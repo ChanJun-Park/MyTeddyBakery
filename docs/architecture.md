@@ -61,13 +61,22 @@
 
 ### 상태 관리
 
-**패턴**: 단방향 데이터 흐름 (UDF)
+**Pattern**: 단방향 데이터 흐름 (UDF) + 상태 분리 최적화
 
 ```kotlin
 // 예시: RhythmViewModel
 class RhythmViewModel : ViewModel() {
+    // 게임 상태 (변경이 적음)
     private val _uiState = MutableStateFlow(RhythmUiState())
     val uiState: StateFlow<RhythmUiState> = _uiState.asStateFlow()
+    
+    // 현재 시간 (매 프레임 변경)
+    private val _currentTime = MutableStateFlow(0f)
+    val currentTime: StateFlow<Float> = _currentTime.asStateFlow()
+    
+    // 판정 결과 (빠른 이벤트)
+    private val _judgementResult = MutableStateFlow<JudgementResult?>(null)
+    val judgementResult: StateFlow<JudgementResult?> = _judgementResult.asStateFlow()
     
     fun onEvent(event: RhythmEvent) {
         when (event) {
@@ -79,6 +88,11 @@ class RhythmViewModel : ViewModel() {
 }
 ```
 
+**상태 분리 전략**:
+- **자주 변경되는 상태**: 별도 `StateFlow`로 관리 (예: `currentTime`)
+- **이벤트성 상태**: 독립적인 `StateFlow`로 관리 (예: `judgementResult`)
+- **게임 상태**: 변경이 있을 때만 업데이트하여 불필요한 리컴포지션 방지
+
 **UI State 클래스**:
 ```kotlin
 data class BakeryUiState(
@@ -89,10 +103,10 @@ data class BakeryUiState(
 
 data class RhythmUiState(
     val notes: List<Note> = emptyList(),
-    val currentTime: Float = 0f,
+    // currentTime 제거 (별도 StateFlow)
     val score: Int = 0,
     val combo: Int = 0,
-    val judgement: Judgement? = null,
+    // judgementEvent 제거 (별도 StateFlow)
     val isPlaying: Boolean = false
 )
 

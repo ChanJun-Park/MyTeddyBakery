@@ -12,5 +12,5 @@ data class RhythmState(
     val perfectCount: Int = 0,
     val goodCount: Int = 0,
     val missCount: Int = 0,
-    val lastJudgement: Judgement? = null
+    val lastJudgementResult: JudgementResult? = null
 )

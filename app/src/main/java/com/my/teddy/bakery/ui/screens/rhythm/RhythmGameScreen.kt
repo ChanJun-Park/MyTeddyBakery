@@ -32,6 +32,7 @@ fun RhythmGameScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentTime by viewModel.currentTime.collectAsStateWithLifecycle()
+    val judgementEvent by viewModel.judgementResult.collectAsStateWithLifecycle()
     
     // 게임 시작
     LaunchedEffect(Unit) {
@@ -79,7 +80,7 @@ fun RhythmGameScreen(
             
             // 중앙: 판정 표시
             JudgementDisplay(
-                judgementEvent = uiState.judgementEvent,
+                judgementResult = judgementEvent,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             

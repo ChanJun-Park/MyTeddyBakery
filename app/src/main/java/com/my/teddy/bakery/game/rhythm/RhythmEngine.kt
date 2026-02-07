@@ -3,6 +3,7 @@ package com.my.teddy.bakery.game.rhythm
 import com.my.teddy.bakery.game.rhythm.models.Note
 import com.my.teddy.bakery.game.rhythm.models.RhythmState
 import com.my.teddy.bakery.game.rhythm.models.Judgement
+import com.my.teddy.bakery.game.rhythm.models.JudgementResult
 
 /**
  * 리듬 게임의 핵심 엔진
@@ -108,23 +109,25 @@ class RhythmEngine(
             0
         }
         
+        val judgementResult = JudgementResult(noteId, judgement)
+        
         currentState = when (judgement) {
             Judgement.PERFECT -> currentState.copy(
                 perfectCount = currentState.perfectCount + 1,
                 score = currentState.score + judgement.score,
                 combo = newCombo,
-                lastJudgement = judgement
+                lastJudgementResult = judgementResult
             )
             Judgement.GOOD -> currentState.copy(
                 goodCount = currentState.goodCount + 1,
                 score = currentState.score + judgement.score,
                 combo = newCombo,
-                lastJudgement = judgement
+                lastJudgementResult = judgementResult
             )
             Judgement.MISS -> currentState.copy(
                 missCount = currentState.missCount + 1,
                 combo = 0,
-                lastJudgement = judgement
+                lastJudgementResult = judgementResult
             )
         }
     }

@@ -1,14 +1,17 @@
 package com.my.teddy.bakery.ui.screens.rhythm.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,59 +26,63 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.my.teddy.bakery.game.rhythm.models.Judgement
-import com.my.teddy.bakery.ui.screens.rhythm.JudgementEvent
+import com.my.teddy.bakery.game.rhythm.models.JudgementResult
 import kotlinx.coroutines.delay
 
 /**
  * 판정 결과 표시 컴포넌트
- * 
+ *
  * Perfect/Good/Miss를 애니메이션과 함께 표시
  */
 @Composable
 fun JudgementDisplay(
-    judgementEvent: JudgementEvent?,
-    modifier: Modifier = Modifier
+    judgementResult: JudgementResult?,
+    modifier: Modifier = Modifier,
 ) {
-    var currentJudgement by remember { mutableStateOf<Judgement?>(null) }
-    var showAnimation by remember { mutableStateOf(false) }
-    
-    // 판정 이벤트가 발생할 때마다 애니메이션 트리거
-    // timestamp가 다르므로 같은 판정이 연속으로 나와도 재실행됨
-    LaunchedEffect(judgementEvent) {
-        if (judgementEvent != null) {
-            currentJudgement = judgementEvent.judgement
-            showAnimation = true
-            delay(500) // 0.5초 후 사라짐
-            showAnimation = false
-        }
-    }
-    
     Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxWidth()
-            .height(100.dp),
-        contentAlignment = Alignment.Center
+            .height(100.dp)
+            .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 1f))
     ) {
-        AnimatedVisibility(
-            visible = showAnimation,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
-        ) {
-            currentJudgement?.let { judgement ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+        Crossfade(
+            targetState = judgementResult
+        ) { currentState ->
+            var showAnimation by remember { mutableStateOf(false) }
+
+            // 판정 이벤트가 발생할 때마다 애니메이션 트리거
+            // timestamp가 다르므로 같은 판정이 연속으로 나와도 재실행됨
+            LaunchedEffect(Unit) {
+                if (currentState != null) {
+                    showAnimation = true
+                    delay(500) // 0.5초 후 사라짐
+                    showAnimation = false
+                }
+            }
+
+            currentState?.let {
+                AnimatedVisibility(
+                    visible = showAnimation,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
                 ) {
-                    Text(
-                        text = getJudgementText(judgement),
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = getJudgementColor(judgement)
-                    )
-                    Text(
-                        text = "+${judgement.score}",
-                        fontSize = 24.sp,
-                        color = getJudgementColor(judgement)
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = getJudgementText(currentState.judgement),
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = getJudgementColor(currentState.judgement)
+                        )
+                        Text(
+                            text = "+${currentState.judgement.score}",
+                            fontSize = 24.sp,
+                            color = getJudgementColor(currentState.judgement)
+                        )
+                    }
                 }
             }
         }
