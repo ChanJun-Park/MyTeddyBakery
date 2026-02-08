@@ -48,7 +48,13 @@ class BakingEngine(
         
         // 게임 종료 체크 (시간 또는 모든 동작 완료)
         if (currentTime >= gameDuration || currentNoteIndex >= allNotes.size) {
-            currentState = currentState.copy(isPlaying = false)
+            // 게임 종료 시 남은 노트들을 wrongCount에 반영
+            val remainingNotes = allNotes.size - currentNoteIndex
+            
+            currentState = currentState.copy(
+                isPlaying = false,
+                wrongCount = currentState.wrongCount + remainingNotes
+            )
             return currentState
         }
         
