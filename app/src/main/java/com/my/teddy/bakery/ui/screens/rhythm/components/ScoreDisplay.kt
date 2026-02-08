@@ -7,16 +7,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /**
- * 점수 및 콤보 표시 컴포넌트
+ * 점수 표시 컴포넌트
  */
 @Composable
 fun ScoreDisplay(
     score: Int,
-    combo: Int,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -26,11 +26,11 @@ fun ScoreDisplay(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 점수
-            Column {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "점수",
                     style = MaterialTheme.typography.bodySmall,
@@ -42,22 +42,6 @@ fun ScoreDisplay(
                     fontWeight = FontWeight.Bold
                 )
             }
-            
-            // 콤보
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "콤보",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "${combo}x",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = if (combo > 0) MaterialTheme.colorScheme.primary 
-                           else MaterialTheme.colorScheme.onSurface
-                )
-            }
         }
     }
 }
@@ -67,9 +51,8 @@ fun ScoreDisplay(
  */
 @Composable
 fun JudgementCountDisplay(
-    perfectCount: Int,
-    goodCount: Int,
-    missCount: Int,
+    correctCount: Int,
+    wrongCount: Int,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -81,9 +64,8 @@ fun JudgementCountDisplay(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            JudgementCountItem("Perfect", perfectCount, MaterialTheme.colorScheme.primary)
-            JudgementCountItem("Good", goodCount, MaterialTheme.colorScheme.secondary)
-            JudgementCountItem("Miss", missCount, MaterialTheme.colorScheme.error)
+            JudgementCountItem("정답", correctCount, Color(0xFF4CAF50))
+            JudgementCountItem("오답", wrongCount, Color(0xFFF44336))
         }
     }
 }
@@ -92,7 +74,7 @@ fun JudgementCountDisplay(
 private fun JudgementCountItem(
     label: String,
     count: Int,
-    color: androidx.compose.ui.graphics.Color
+    color: Color
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(

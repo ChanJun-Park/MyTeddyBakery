@@ -10,35 +10,28 @@ class ScoreCalculator {
     /**
      * 정확도 계산
      * 
-     * @param perfectCount Perfect 판정 개수
-     * @param goodCount Good 판정 개수
-     * @param missCount Miss 판정 개수
+     * @param correctCount 올바른 인터랙션 개수
+     * @param wrongCount 잘못된 인터랙션 개수
      * @return 정확도 (0.0 ~ 1.0)
      */
     fun calculateAccuracy(
-        perfectCount: Int,
-        goodCount: Int,
-        missCount: Int
+        correctCount: Int,
+        wrongCount: Int
     ): Float {
-        val totalNotes = perfectCount + goodCount + missCount
+        val totalNotes = correctCount + wrongCount
         if (totalNotes == 0) return 0f
         
-        val earnedScore = (perfectCount * Judgement.PERFECT.score) + 
-                         (goodCount * Judgement.GOOD.score)
-        val maxScore = totalNotes * Judgement.PERFECT.score
-        
-        return earnedScore.toFloat() / maxScore
+        return correctCount.toFloat() / totalNotes
     }
     
     /**
      * 총 점수 계산
      */
     fun calculateScore(
-        perfectCount: Int,
-        goodCount: Int,
-        missCount: Int
+        correctCount: Int,
+        wrongCount: Int
     ): Int {
-        return (perfectCount * Judgement.PERFECT.score) + 
-               (goodCount * Judgement.GOOD.score)
+        return (correctCount * Judgement.CORRECT.score) + 
+               (wrongCount * Judgement.WRONG.score)
     }
 }

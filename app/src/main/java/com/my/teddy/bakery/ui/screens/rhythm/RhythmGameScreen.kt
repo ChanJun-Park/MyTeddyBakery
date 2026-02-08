@@ -14,16 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.my.teddy.bakery.ui.screens.rhythm.components.CurrentNoteDisplay
 import com.my.teddy.bakery.ui.screens.rhythm.components.GameProgressBar
+import com.my.teddy.bakery.ui.screens.rhythm.components.InteractionButtons
 import com.my.teddy.bakery.ui.screens.rhythm.components.JudgementCountDisplay
 import com.my.teddy.bakery.ui.screens.rhythm.components.JudgementDisplay
-import com.my.teddy.bakery.ui.screens.rhythm.components.NoteLane
 import com.my.teddy.bakery.ui.screens.rhythm.components.ScoreDisplay
 
 /**
- * 리듬 게임 화면
+ * 순서 기반 게임 화면
  * 
- * 노트를 표시하고 플레이어 입력을 받아 판정 처리
+ * 순서대로 표시되는 노트의 타입에 맞게 인터랙션 수행
  */
 @Composable
 fun RhythmGameScreen(
@@ -42,10 +43,9 @@ fun RhythmGameScreen(
     // 게임 완료 체크
     LaunchedEffect(uiState.isGameComplete) {
         if (uiState.isGameComplete) {
-            // 정확도 계산
-            val total = uiState.perfectCount + uiState.goodCount + uiState.missCount
+            val total = uiState.correctCount + uiState.wrongCount
             val accuracy = if (total > 0) {
-                ((uiState.perfectCount * 100 + uiState.goodCount * 50).toFloat() / (total * 100))
+                uiState.correctCount.toFloat() / total
             } else {
                 0f
             }
@@ -69,10 +69,9 @@ fun RhythmGameScreen(
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // 점수 및 콤보 표시
+            // 점수 표시
             ScoreDisplay(
                 score = uiState.score,
-                combo = uiState.combo,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             
@@ -84,29 +83,34 @@ fun RhythmGameScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             
-            // 노트 레인 (가장 중요한 영역)
-            NoteLane(
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // 현재 수행할 노트 표시
+            CurrentNoteDisplay(
+                notes = uiState.allNotes,
+                currentIndex = uiState.currentNoteIndex,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(horizontal = 16.dp),
-                notes = uiState.notes,
-                currentTime = currentTime,
-                onNoteTap = { note ->
-                    viewModel.onNoteTap(note)
-                },
-                onNoteSwipe = { note, direction ->
-                    viewModel.onNoteTap(note) // 임시로 탭과 동일하게 처리
-                }
+                    .padding(horizontal = 16.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // 인터랙션 버튼들 (뭉치기, 치대기, 두드리기)
+            InteractionButtons(
+                onKnead = { viewModel.onInteraction(com.my.teddy.bakery.game.rhythm.models.NoteType.KNEAD) },
+                onFold = { viewModel.onInteraction(com.my.teddy.bakery.game.rhythm.models.NoteType.FOLD) },
+                onPound = { viewModel.onInteraction(com.my.teddy.bakery.game.rhythm.models.NoteType.POUND) },
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
             // 하단: 판정 카운트
             JudgementCountDisplay(
-                perfectCount = uiState.perfectCount,
-                goodCount = uiState.goodCount,
-                missCount = uiState.missCount,
+                correctCount = uiState.correctCount,
+                wrongCount = uiState.wrongCount,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             

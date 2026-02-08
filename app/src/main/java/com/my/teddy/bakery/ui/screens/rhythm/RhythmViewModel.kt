@@ -28,14 +28,13 @@ import javax.inject.Inject
  * currentTime은 별도 StateFlow로 관리하여 불필요한 객체 생성 방지
  */
 data class RhythmUiState(
-    val notes: List<Note> = emptyList(),
+    val allNotes: List<Note> = emptyList(),
+    val currentNoteIndex: Int = 0,
     val score: Int = 0,
-    val combo: Int = 0,
     val isPlaying: Boolean = false,
     val isGameComplete: Boolean = false,
-    val perfectCount: Int = 0,
-    val goodCount: Int = 0,
-    val missCount: Int = 0,
+    val correctCount: Int = 0,
+    val wrongCount: Int = 0,
     val coinsEarned: Int = 0,
 )
 
@@ -74,9 +73,13 @@ class RhythmViewModel @Inject constructor(
 
             _uiState.update {
                 it.copy(
-                    notes = notes,
+                    allNotes = notes,
+                    currentNoteIndex = 0,
                     isPlaying = true,
-                    isGameComplete = false
+                    isGameComplete = false,
+                    correctCount = 0,
+                    wrongCount = 0,
+                    score = 0
                 )
             }
 
@@ -107,24 +110,20 @@ class RhythmViewModel @Inject constructor(
 
             // 게임 상태는 변경이 있을 때만 업데이트 (최적화)
             val hasStateChange = 
-                state.notes != _uiState.value.notes ||
+                state.currentNoteIndex != _uiState.value.currentNoteIndex ||
                 state.score != _uiState.value.score ||
-                state.combo != _uiState.value.combo ||
-                state.perfectCount != _uiState.value.perfectCount ||
-                state.goodCount != _uiState.value.goodCount ||
-                state.missCount != _uiState.value.missCount ||
+                state.correctCount != _uiState.value.correctCount ||
+                state.wrongCount != _uiState.value.wrongCount ||
                 state.lastJudgementResult != null ||  // 판정이 발생하면 항상 업데이트
                 state.isPlaying != _uiState.value.isPlaying
             
             if (hasStateChange) {
                 _uiState.update {
                     it.copy(
-                        notes = state.notes,
+                        currentNoteIndex = state.currentNoteIndex,
                         score = state.score,
-                        combo = state.combo,
-                        perfectCount = state.perfectCount,
-                        goodCount = state.goodCount,
-                        missCount = state.missCount,
+                        correctCount = state.correctCount,
+                        wrongCount = state.wrongCount,
                         isPlaying = state.isPlaying
                     )
                 }
@@ -147,18 +146,23 @@ class RhythmViewModel @Inject constructor(
     }
 
     /**
-     * 노트 입력 처리
+     * 인터랙션 처리
+     * 
+     * @param inputType 플레이어가 수행한 인터랙션 타입
      */
-    fun onNoteTap(note: Note) {
-        val currentTime = rhythmEngine.getCurrentTime() * 1000 // 초 -> ms
-        val noteTime = note.time * 1000
-
-        Log.d("RhythmViewModel", "노트 입력: id=${note.id}, 현재=${currentTime}ms, 노트=${noteTime}ms, 차이=${kotlin.math.abs(currentTime - noteTime)}ms")
-
-        val judgement = judgementSystem.judge(currentTime, noteTime)
-        Log.d("RhythmViewModel", "판정 결과: noteId=${note.id}, $judgement")
+    fun onInteraction(inputType: com.my.teddy.bakery.game.rhythm.models.NoteType) {
+        val currentNote = rhythmEngine.getCurrentNote()
+        if (currentNote == null) {
+            Log.d("RhythmViewModel", "현재 수행할 노트가 없음")
+            return
+        }
         
-        rhythmEngine.processNote(note.id, judgement)
+        Log.d("RhythmViewModel", "인터랙션: 입력=${inputType}, 기대=${currentNote.type}, 노트ID=${currentNote.id}")
+        
+        val judgement = judgementSystem.judge(inputType, currentNote.type)
+        Log.d("RhythmViewModel", "판정 결과: noteId=${currentNote.id}, $judgement")
+        
+        rhythmEngine.processInteraction(inputType, judgement)
     }
 
     /**
@@ -169,9 +173,8 @@ class RhythmViewModel @Inject constructor(
 
         // 정확도 계산
         val accuracy = scoreCalculator.calculateAccuracy(
-            perfectCount = state.perfectCount,
-            goodCount = state.goodCount,
-            missCount = state.missCount
+            correctCount = state.correctCount,
+            wrongCount = state.wrongCount
         )
 
         // 게임 상태에서 업그레이드 정보 가져오기
@@ -191,10 +194,10 @@ class RhythmViewModel @Inject constructor(
         val result = RhythmResult(
             score = state.score,
             accuracy = accuracy,
-            perfectCount = state.perfectCount,
-            goodCount = state.goodCount,
-            missCount = state.missCount,
-            maxCombo = state.combo,
+            perfectCount = state.correctCount,
+            goodCount = 0,
+            missCount = state.wrongCount,
+            maxCombo = 0,
             coinsEarned = coinsEarned
         )
 

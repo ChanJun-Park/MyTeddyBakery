@@ -32,7 +32,7 @@ import kotlinx.coroutines.delay
 /**
  * 판정 결과 표시 컴포넌트
  *
- * Perfect/Good/Miss를 애니메이션과 함께 표시
+ * Correct/Wrong을 애니메이션과 함께 표시
  */
 @Composable
 fun JudgementDisplay(
@@ -94,9 +94,8 @@ fun JudgementDisplay(
  */
 private fun getJudgementText(judgement: Judgement): String {
     return when (judgement) {
-        Judgement.PERFECT -> "PERFECT!"
-        Judgement.GOOD -> "GOOD"
-        Judgement.MISS -> "MISS"
+        Judgement.CORRECT -> "정답!"
+        Judgement.WRONG -> "오답!"
     }
 }
 
@@ -106,8 +105,7 @@ private fun getJudgementText(judgement: Judgement): String {
 @Composable
 private fun getJudgementColor(judgement: Judgement): Color {
     return when (judgement) {
-        Judgement.PERFECT -> Color(0xFFFFD700) // 금색
-        Judgement.GOOD -> Color(0xFF4CAF50) // 녹색
-        Judgement.MISS -> Color(0xFFF44336) // 빨간색
+        Judgement.CORRECT -> Color(0xFF4CAF50) // 초록색
+        Judgement.WRONG -> Color(0xFFF44336) // 빨간색
     }
 }

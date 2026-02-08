@@ -25,9 +25,13 @@ class NoteManager {
         var id = 0
         var beatTime = 2f // 2초 후부터 시작 (준비 시간)
         
-        // TAP 노트만 생성 (MVP용)
+        // 뭉치기, 치대기, 두드리기 동작을 순환하며 생성
+        val noteTypes = listOf(NoteType.KNEAD, NoteType.FOLD, NoteType.POUND)
+        
         while (beatTime < duration - 1f) {
-            notes.add(Note(id++, NoteType.TAP, beatTime))
+            // 순서대로 노트 타입을 순환
+            val noteType = noteTypes[id % noteTypes.size]
+            notes.add(Note(id++, noteType, beatTime))
             beatTime += beatInterval
         }
         

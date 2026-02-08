@@ -1,13 +1,12 @@
 package com.my.teddy.bakery.game.rhythm.models
 
 /**
- * 리듬 게임의 노트 타입
+ * 빵 만들기 동작 타입
  */
 enum class NoteType {
-    TAP,        // 탭 노트
-    HOLD,       // 홀드 노트
-    SWIPE_LEFT, // 왼쪽 스와이프
-    SWIPE_RIGHT // 오른쪽 스와이프
+    KNEAD,  // 뭉치기
+    FOLD,   // 치대기
+    POUND   // 두드리기
 }
 
 /**

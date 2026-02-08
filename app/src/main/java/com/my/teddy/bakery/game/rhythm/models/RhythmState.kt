@@ -6,11 +6,10 @@ package com.my.teddy.bakery.game.rhythm.models
 data class RhythmState(
     val currentTime: Float = 0f,
     val isPlaying: Boolean = false,
-    val notes: List<Note> = emptyList(),
+    val allNotes: List<Note> = emptyList(),          // 전체 노트 리스트
+    val currentNoteIndex: Int = 0,                    // 현재 수행해야 할 노트 인덱스
     val score: Int = 0,
-    val combo: Int = 0,
-    val perfectCount: Int = 0,
-    val goodCount: Int = 0,
-    val missCount: Int = 0,
+    val correctCount: Int = 0,
+    val wrongCount: Int = 0,
     val lastJudgementResult: JudgementResult? = null
 )

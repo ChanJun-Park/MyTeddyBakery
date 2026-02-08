@@ -4,22 +4,20 @@ import com.my.teddy.bakery.game.rhythm.models.Note
 import com.my.teddy.bakery.game.rhythm.models.RhythmState
 import com.my.teddy.bakery.game.rhythm.models.Judgement
 import com.my.teddy.bakery.game.rhythm.models.JudgementResult
+import com.my.teddy.bakery.game.rhythm.models.NoteType
 
 /**
- * 리듬 게임의 핵심 엔진
+ * 순서 기반 게임 엔진
  * 
- * 게임 시간 관리, 노트 업데이트, 상태 관리를 담당
+ * 타이밍 대신 순서대로 노트를 처리하는 게임 로직
  */
 class RhythmEngine(
-    private val bpm: Int = 120,
     private val songDuration: Float = 25f
 ) {
     private var currentTime: Float = 0f
-    private val beatInterval = 60f / bpm // 0.5초 at 120 BPM
     
     private var allNotes: List<Note> = emptyList()
-    private var activeNotes: MutableList<Note> = mutableListOf()
-    private var processedNoteIds: MutableSet<Int> = mutableSetOf()
+    private var currentNoteIndex: Int = 0
     
     private var currentState = RhythmState()
     
@@ -27,11 +25,14 @@ class RhythmEngine(
      * 게임 초기화
      */
     fun initialize(notes: List<Note>) {
-        allNotes = notes.sortedBy { it.time }
-        activeNotes.clear()
-        processedNoteIds.clear()
+        allNotes = notes
+        currentNoteIndex = 0
         currentTime = 0f
-        currentState = RhythmState(isPlaying = true, notes = notes)
+        currentState = RhythmState(
+            isPlaying = true, 
+            allNotes = notes,
+            currentNoteIndex = 0
+        )
     }
     
     /**
@@ -45,90 +46,59 @@ class RhythmEngine(
         
         currentTime += deltaTime
         
-        // 게임 종료 체크
-        if (currentTime >= songDuration) {
+        // 게임 종료 체크 (시간 또는 모든 노트 완료)
+        if (currentTime >= songDuration || currentNoteIndex >= allNotes.size) {
             currentState = currentState.copy(isPlaying = false)
             return currentState
         }
         
-        // 활성 노트 업데이트
-        updateActiveNotes()
-        
-        // Miss 자동 판정 (노트가 판정선을 지나갔을 때)
-        checkMissedNotes()
-        
         currentState = currentState.copy(
             currentTime = currentTime,
-            notes = activeNotes
+            currentNoteIndex = currentNoteIndex
         )
         
         return currentState
     }
     
     /**
-     * Miss된 노트 자동 체크
-     * 판정선을 지나간 노트들을 Miss 처리
+     * 인터랙션 처리
+     * 
+     * @param inputType 플레이어가 수행한 인터랙션 타입
+     * @param judgement 판정 결과
      */
-    private fun checkMissedNotes() {
-        val missWindow = 0.2f // 200ms 허용 범위
+    fun processInteraction(inputType: NoteType, judgement: Judgement) {
+        val currentNote = getCurrentNote() ?: return
         
-        allNotes.filter { note ->
-            !processedNoteIds.contains(note.id) &&
-            (currentTime - note.time) > missWindow
-        }.forEach { note ->
-            processNote(note.id, Judgement.MISS)
-        }
-    }
-    
-    /**
-     * 현재 시간 기준으로 활성 노트 업데이트
-     */
-    private fun updateActiveNotes() {
-        // 화면에 보여줄 노트들 추가 (현재 시간 기준 앞뒤 3초)
-        val visibleWindow = 3f
-        
-        activeNotes.clear()
-        activeNotes.addAll(
-            allNotes.filter { note ->
-                note.time >= currentTime - 0.5f && 
-                note.time <= currentTime + visibleWindow &&
-                !processedNoteIds.contains(note.id)
-            }
-        )
-    }
-    
-    /**
-     * 노트 처리 (판정 후 호출)
-     */
-    fun processNote(noteId: Int, judgement: Judgement) {
-        processedNoteIds.add(noteId)
-        
-        val newCombo = if (judgement != Judgement.MISS) {
-            currentState.combo + 1
-        } else {
-            0
+        // 올바른 인터랙션인 경우 다음 노트로 진행
+        if (judgement == Judgement.CORRECT) {
+            currentNoteIndex++
         }
         
-        val judgementResult = JudgementResult(noteId, judgement)
+        val judgementResult = JudgementResult(currentNote.id, judgement)
         
         currentState = when (judgement) {
-            Judgement.PERFECT -> currentState.copy(
-                perfectCount = currentState.perfectCount + 1,
+            Judgement.CORRECT -> currentState.copy(
+                correctCount = currentState.correctCount + 1,
                 score = currentState.score + judgement.score,
-                combo = newCombo,
+                currentNoteIndex = currentNoteIndex,
                 lastJudgementResult = judgementResult
             )
-            Judgement.GOOD -> currentState.copy(
-                goodCount = currentState.goodCount + 1,
+            Judgement.WRONG -> currentState.copy(
+                wrongCount = currentState.wrongCount + 1,
                 score = currentState.score + judgement.score,
-                combo = newCombo,
                 lastJudgementResult = judgementResult
             )
-            Judgement.MISS -> currentState.copy(
-                missCount = currentState.missCount + 1,
-                combo = 0,
-                lastJudgementResult = judgementResult
-            )
+        }
+    }
+    
+    /**
+     * 현재 수행해야 할 노트 반환
+     */
+    fun getCurrentNote(): Note? {
+        return if (currentNoteIndex < allNotes.size) {
+            allNotes[currentNoteIndex]
+        } else {
+            null
         }
     }
     
@@ -137,8 +107,7 @@ class RhythmEngine(
      */
     fun reset() {
         currentTime = 0f
-        activeNotes.clear()
-        processedNoteIds.clear()
+        currentNoteIndex = 0
         currentState = RhythmState()
     }
     
