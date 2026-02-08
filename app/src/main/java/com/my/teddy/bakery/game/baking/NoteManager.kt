@@ -1,22 +1,22 @@
-package com.my.teddy.bakery.game.rhythm
+package com.my.teddy.bakery.game.baking
 
-import com.my.teddy.bakery.game.rhythm.models.Note
-import com.my.teddy.bakery.game.rhythm.models.NoteType
+import com.my.teddy.bakery.game.baking.models.Note
+import com.my.teddy.bakery.game.baking.models.NoteType
 
 /**
- * 노트 생성 및 관리 시스템
+ * 동작 생성 및 관리 시스템
  */
 class NoteManager {
     
     /**
-     * 게임용 노트 패턴 생성
+     * 게임용 동작 패턴 생성
      * 
      * MVP에서는 하드코딩된 패턴 사용
      * 추후 JSON 파일에서 로드하도록 확장 가능
      * 
      * @param duration 게임 길이 (초)
-     * @param bpm 곡의 BPM
-     * @return 생성된 노트 리스트
+     * @param bpm 동작의 BPM (속도)
+     * @return 생성된 동작 리스트
      */
     fun generateNotes(duration: Float, bpm: Int = 120): List<Note> {
         val notes = mutableListOf<Note>()
@@ -29,7 +29,7 @@ class NoteManager {
         val noteTypes = listOf(NoteType.KNEAD, NoteType.FOLD, NoteType.POUND)
         
         while (beatTime < duration - 1f) {
-            // 순서대로 노트 타입을 순환
+            // 순서대로 동작 타입을 순환
             val noteType = noteTypes[id % noteTypes.size]
             notes.add(Note(id++, noteType, beatTime))
             beatTime += beatInterval

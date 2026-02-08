@@ -1,4 +1,4 @@
-package com.my.teddy.bakery.ui.screens.rhythm.components
+package com.my.teddy.bakery.ui.screens.baking.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

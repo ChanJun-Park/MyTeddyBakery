@@ -1,4 +1,4 @@
-package com.my.teddy.bakery.ui.screens.rhythm
+package com.my.teddy.bakery.ui.screens.baking
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,22 +14,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.my.teddy.bakery.ui.screens.rhythm.components.CurrentNoteDisplay
-import com.my.teddy.bakery.ui.screens.rhythm.components.GameProgressBar
-import com.my.teddy.bakery.ui.screens.rhythm.components.InteractionButtons
-import com.my.teddy.bakery.ui.screens.rhythm.components.JudgementCountDisplay
-import com.my.teddy.bakery.ui.screens.rhythm.components.JudgementDisplay
-import com.my.teddy.bakery.ui.screens.rhythm.components.ScoreDisplay
+import com.my.teddy.bakery.ui.screens.baking.components.CurrentNoteDisplay
+import com.my.teddy.bakery.ui.screens.baking.components.GameProgressBar
+import com.my.teddy.bakery.ui.screens.baking.components.InteractionButtons
+import com.my.teddy.bakery.ui.screens.baking.components.JudgementCountDisplay
+import com.my.teddy.bakery.ui.screens.baking.components.JudgementDisplay
+import com.my.teddy.bakery.ui.screens.baking.components.ScoreDisplay
 
 /**
- * 순서 기반 게임 화면
+ * 빵 만들기 게임 화면
  * 
- * 순서대로 표시되는 노트의 타입에 맞게 인터랙션 수행
+ * 순서대로 표시되는 동작의 타입에 맞게 인터랙션 수행
  */
 @Composable
-fun RhythmGameScreen(
+fun BakingGameScreen(
     onGameComplete: (accuracy: Float, coinsEarned: Int) -> Unit,
-    viewModel: RhythmViewModel = hiltViewModel()
+    viewModel: BakingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentTime by viewModel.currentTime.collectAsStateWithLifecycle()
@@ -85,7 +85,7 @@ fun RhythmGameScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // 현재 수행할 노트 표시
+            // 현재 수행할 동작 표시
             CurrentNoteDisplay(
                 notes = uiState.allNotes,
                 currentIndex = uiState.currentNoteIndex,
@@ -99,9 +99,9 @@ fun RhythmGameScreen(
             
             // 인터랙션 버튼들 (뭉치기, 치대기, 두드리기)
             InteractionButtons(
-                onKnead = { viewModel.onInteraction(com.my.teddy.bakery.game.rhythm.models.NoteType.KNEAD) },
-                onFold = { viewModel.onInteraction(com.my.teddy.bakery.game.rhythm.models.NoteType.FOLD) },
-                onPound = { viewModel.onInteraction(com.my.teddy.bakery.game.rhythm.models.NoteType.POUND) },
+                onKnead = { viewModel.onInteraction(com.my.teddy.bakery.game.baking.models.NoteType.KNEAD) },
+                onFold = { viewModel.onInteraction(com.my.teddy.bakery.game.baking.models.NoteType.FOLD) },
+                onPound = { viewModel.onInteraction(com.my.teddy.bakery.game.baking.models.NoteType.POUND) },
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             

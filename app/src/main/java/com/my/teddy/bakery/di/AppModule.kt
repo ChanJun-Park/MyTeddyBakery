@@ -5,10 +5,10 @@ import com.my.teddy.bakery.data.local.GameDataStore
 import com.my.teddy.bakery.data.repository.GameDataRepository
 import com.my.teddy.bakery.game.economy.BreadPriceCalculator
 import com.my.teddy.bakery.game.economy.UpgradeManager
-import com.my.teddy.bakery.game.rhythm.JudgementSystem
-import com.my.teddy.bakery.game.rhythm.NoteManager
-import com.my.teddy.bakery.game.rhythm.RhythmEngine
-import com.my.teddy.bakery.game.rhythm.ScoreCalculator
+import com.my.teddy.bakery.game.baking.JudgementSystem
+import com.my.teddy.bakery.game.baking.NoteManager
+import com.my.teddy.bakery.game.baking.BakingEngine
+import com.my.teddy.bakery.game.baking.ScoreCalculator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,14 +49,14 @@ object AppModule {
         return GameDataRepository(dataStore)
     }
     
-    // ===== Game Logic Layer - Rhythm =====
+    // ===== Game Logic Layer - Baking =====
     
     /**
-     * RhythmEngine 제공 (매번 새 인스턴스)
+     * BakingEngine 제공 (매번 새 인스턴스)
      */
     @Provides
-    fun provideRhythmEngine(): RhythmEngine {
-        return RhythmEngine()
+    fun provideBakingEngine(): BakingEngine {
+        return BakingEngine()
     }
     
     /**

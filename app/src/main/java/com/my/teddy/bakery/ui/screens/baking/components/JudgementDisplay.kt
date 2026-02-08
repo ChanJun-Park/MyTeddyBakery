@@ -1,4 +1,4 @@
-package com.my.teddy.bakery.ui.screens.rhythm.components
+package com.my.teddy.bakery.ui.screens.baking.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.my.teddy.bakery.game.rhythm.models.Judgement
-import com.my.teddy.bakery.game.rhythm.models.JudgementResult
+import com.my.teddy.bakery.game.baking.models.Judgement
+import com.my.teddy.bakery.game.baking.models.JudgementResult
 import kotlinx.coroutines.delay
 
 /**

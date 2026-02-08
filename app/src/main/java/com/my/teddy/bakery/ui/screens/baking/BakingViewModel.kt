@@ -1,17 +1,17 @@
-package com.my.teddy.bakery.ui.screens.rhythm
+package com.my.teddy.bakery.ui.screens.baking
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.my.teddy.bakery.data.model.RhythmResult
+import com.my.teddy.bakery.data.model.BakingResult
 import com.my.teddy.bakery.data.repository.GameDataRepository
 import com.my.teddy.bakery.game.economy.BreadPriceCalculator
-import com.my.teddy.bakery.game.rhythm.JudgementSystem
-import com.my.teddy.bakery.game.rhythm.NoteManager
-import com.my.teddy.bakery.game.rhythm.RhythmEngine
-import com.my.teddy.bakery.game.rhythm.ScoreCalculator
-import com.my.teddy.bakery.game.rhythm.models.JudgementResult
-import com.my.teddy.bakery.game.rhythm.models.Note
+import com.my.teddy.bakery.game.baking.JudgementSystem
+import com.my.teddy.bakery.game.baking.NoteManager
+import com.my.teddy.bakery.game.baking.BakingEngine
+import com.my.teddy.bakery.game.baking.ScoreCalculator
+import com.my.teddy.bakery.game.baking.models.JudgementResult
+import com.my.teddy.bakery.game.baking.models.Note
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,11 +23,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * 리듬 게임 화면의 UI 상태
+ * 빵 만들기 게임 화면의 UI 상태
  *
  * currentTime은 별도 StateFlow로 관리하여 불필요한 객체 생성 방지
  */
-data class RhythmUiState(
+data class BakingUiState(
     val allNotes: List<Note> = emptyList(),
     val currentNoteIndex: Int = 0,
     val score: Int = 0,
@@ -39,12 +39,12 @@ data class RhythmUiState(
 )
 
 /**
- * 리듬 게임 화면의 ViewModel
+ * 빵 만들기 게임 화면의 ViewModel
  */
 @HiltViewModel
-class RhythmViewModel @Inject constructor(
+class BakingViewModel @Inject constructor(
     private val repository: GameDataRepository,
-    private val rhythmEngine: RhythmEngine,
+    private val bakingEngine: BakingEngine,
     private val judgementSystem: JudgementSystem,
     private val scoreCalculator: ScoreCalculator,
     private val noteManager: NoteManager,
@@ -52,8 +52,8 @@ class RhythmViewModel @Inject constructor(
 ) : ViewModel() {
 
     // 게임 상태 (변경이 적음)
-    private val _uiState = MutableStateFlow(RhythmUiState())
-    val uiState: StateFlow<RhythmUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(BakingUiState())
+    val uiState: StateFlow<BakingUiState> = _uiState.asStateFlow()
 
     // 현재 시간 (매 프레임 변경, 별도 관리)
     private val _currentTime = MutableStateFlow(0f)
@@ -67,9 +67,9 @@ class RhythmViewModel @Inject constructor(
      */
     fun startGame() {
         viewModelScope.launch {
-            // 노트 생성
+            // 동작 생성
             val notes = noteManager.generateNotes(duration = 25f, bpm = 120)
-            rhythmEngine.initialize(notes)
+            bakingEngine.initialize(notes)
 
             _uiState.update {
                 it.copy(
@@ -103,7 +103,7 @@ class RhythmViewModel @Inject constructor(
             lastTime = currentTime
 
             // 엔진 업데이트
-            val state = rhythmEngine.update(deltaTime)
+            val state = bakingEngine.update(deltaTime)
 
             // 시간만 업데이트 (매 프레임, 빠름)
             _currentTime.value = state.currentTime
@@ -150,19 +150,19 @@ class RhythmViewModel @Inject constructor(
      * 
      * @param inputType 플레이어가 수행한 인터랙션 타입
      */
-    fun onInteraction(inputType: com.my.teddy.bakery.game.rhythm.models.NoteType) {
-        val currentNote = rhythmEngine.getCurrentNote()
+    fun onInteraction(inputType: com.my.teddy.bakery.game.baking.models.NoteType) {
+        val currentNote = bakingEngine.getCurrentNote()
         if (currentNote == null) {
-            Log.d("RhythmViewModel", "현재 수행할 노트가 없음")
+            Log.d("BakingViewModel", "현재 수행할 동작이 없음")
             return
         }
         
-        Log.d("RhythmViewModel", "인터랙션: 입력=${inputType}, 기대=${currentNote.type}, 노트ID=${currentNote.id}")
+        Log.d("BakingViewModel", "인터랙션: 입력=${inputType}, 기대=${currentNote.type}, 동작ID=${currentNote.id}")
         
         val judgement = judgementSystem.judge(inputType, currentNote.type)
-        Log.d("RhythmViewModel", "판정 결과: noteId=${currentNote.id}, $judgement")
+        Log.d("BakingViewModel", "판정 결과: noteId=${currentNote.id}, $judgement")
         
-        rhythmEngine.processInteraction(inputType, judgement)
+        bakingEngine.processInteraction(inputType, judgement)
     }
 
     /**
@@ -191,17 +191,15 @@ class RhythmViewModel @Inject constructor(
         )
 
         // 결과 저장
-        val result = RhythmResult(
+        val result = BakingResult(
             score = state.score,
             accuracy = accuracy,
-            perfectCount = state.correctCount,
-            goodCount = 0,
-            missCount = state.wrongCount,
-            maxCombo = 0,
+            correctCount = state.correctCount,
+            wrongCount = state.wrongCount,
             coinsEarned = coinsEarned
         )
 
-        repository.saveRhythmResult(result)
+        repository.saveBakingResult(result)
 
         _uiState.update {
             it.copy(isGameComplete = true, coinsEarned = coinsEarned)
@@ -210,6 +208,6 @@ class RhythmViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        rhythmEngine.reset()
+        bakingEngine.reset()
     }
 }

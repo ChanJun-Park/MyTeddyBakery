@@ -1,6 +1,6 @@
-package com.my.teddy.bakery.game.rhythm
+package com.my.teddy.bakery.game.baking
 
-import com.my.teddy.bakery.game.rhythm.models.Judgement
+import com.my.teddy.bakery.game.baking.models.Judgement
 
 /**
  * 스코어 및 정확도 계산 시스템

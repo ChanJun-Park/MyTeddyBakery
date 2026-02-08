@@ -1,4 +1,4 @@
-package com.my.teddy.bakery.ui.screens.rhythm.components
+package com.my.teddy.bakery.ui.screens.baking.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LinearProgressIndicator

@@ -1,25 +1,25 @@
-package com.my.teddy.bakery.game.rhythm
+package com.my.teddy.bakery.game.baking
 
-import com.my.teddy.bakery.game.rhythm.models.Note
-import com.my.teddy.bakery.game.rhythm.models.RhythmState
-import com.my.teddy.bakery.game.rhythm.models.Judgement
-import com.my.teddy.bakery.game.rhythm.models.JudgementResult
-import com.my.teddy.bakery.game.rhythm.models.NoteType
+import com.my.teddy.bakery.game.baking.models.Note
+import com.my.teddy.bakery.game.baking.models.BakingState
+import com.my.teddy.bakery.game.baking.models.Judgement
+import com.my.teddy.bakery.game.baking.models.JudgementResult
+import com.my.teddy.bakery.game.baking.models.NoteType
 
 /**
- * 순서 기반 게임 엔진
+ * 순서 기반 빵 만들기 게임 엔진
  * 
- * 타이밍 대신 순서대로 노트를 처리하는 게임 로직
+ * 타이밍 대신 순서대로 동작을 처리하는 게임 로직
  */
-class RhythmEngine(
-    private val songDuration: Float = 25f
+class BakingEngine(
+    private val gameDuration: Float = 25f
 ) {
     private var currentTime: Float = 0f
     
     private var allNotes: List<Note> = emptyList()
     private var currentNoteIndex: Int = 0
     
-    private var currentState = RhythmState()
+    private var currentState = BakingState()
     
     /**
      * 게임 초기화
@@ -28,7 +28,7 @@ class RhythmEngine(
         allNotes = notes
         currentNoteIndex = 0
         currentTime = 0f
-        currentState = RhythmState(
+        currentState = BakingState(
             isPlaying = true, 
             allNotes = notes,
             currentNoteIndex = 0
@@ -41,13 +41,13 @@ class RhythmEngine(
      * @param deltaTime 이전 프레임과의 시간 차이 (초)
      * @return 현재 게임 상태
      */
-    fun update(deltaTime: Float): RhythmState {
+    fun update(deltaTime: Float): BakingState {
         if (!currentState.isPlaying) return currentState
         
         currentTime += deltaTime
         
-        // 게임 종료 체크 (시간 또는 모든 노트 완료)
-        if (currentTime >= songDuration || currentNoteIndex >= allNotes.size) {
+        // 게임 종료 체크 (시간 또는 모든 동작 완료)
+        if (currentTime >= gameDuration || currentNoteIndex >= allNotes.size) {
             currentState = currentState.copy(isPlaying = false)
             return currentState
         }
@@ -69,7 +69,7 @@ class RhythmEngine(
     fun processInteraction(inputType: NoteType, judgement: Judgement) {
         val currentNote = getCurrentNote() ?: return
         
-        // 올바른 인터랙션인 경우 다음 노트로 진행
+        // 올바른 인터랙션인 경우 다음 동작으로 진행
         if (judgement == Judgement.CORRECT) {
             currentNoteIndex++
         }
@@ -92,7 +92,7 @@ class RhythmEngine(
     }
     
     /**
-     * 현재 수행해야 할 노트 반환
+     * 현재 수행해야 할 동작 반환
      */
     fun getCurrentNote(): Note? {
         return if (currentNoteIndex < allNotes.size) {
@@ -108,13 +108,13 @@ class RhythmEngine(
     fun reset() {
         currentTime = 0f
         currentNoteIndex = 0
-        currentState = RhythmState()
+        currentState = BakingState()
     }
     
     /**
      * 현재 상태 반환
      */
-    fun getCurrentState(): RhythmState = currentState
+    fun getCurrentState(): BakingState = currentState
     
     /**
      * 현재 시간 반환

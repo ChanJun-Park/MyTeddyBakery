@@ -2,7 +2,7 @@ package com.my.teddy.bakery.data.repository
 
 import com.my.teddy.bakery.data.local.GameDataStore
 import com.my.teddy.bakery.data.model.GameState
-import com.my.teddy.bakery.data.model.RhythmResult
+import com.my.teddy.bakery.data.model.BakingResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -56,11 +56,11 @@ class GameDataRepository @Inject constructor(
     }
     
     /**
-     * 리듬 게임 결과 저장 및 코인 추가
+     * 빵 만들기 게임 결과 저장 및 코인 추가
      * 
      * @param result 게임 결과
      */
-    suspend fun saveRhythmResult(result: RhythmResult) {
+    suspend fun saveBakingResult(result: BakingResult) {
         addCoins(result.coinsEarned)
     }
     

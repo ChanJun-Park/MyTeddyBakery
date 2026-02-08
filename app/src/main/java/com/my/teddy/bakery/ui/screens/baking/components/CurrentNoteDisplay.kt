@@ -1,4 +1,4 @@
-package com.my.teddy.bakery.ui.screens.rhythm.components
+package com.my.teddy.bakery.ui.screens.baking.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.my.teddy.bakery.game.rhythm.models.Note
-import com.my.teddy.bakery.game.rhythm.models.NoteType
+import com.my.teddy.bakery.game.baking.models.Note
+import com.my.teddy.bakery.game.baking.models.NoteType
 
 /**
  * 현재 수행해야 할 노트를 표시하는 컴포넌트

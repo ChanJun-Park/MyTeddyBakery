@@ -1,4 +1,4 @@
-package com.my.teddy.bakery.game.rhythm.models
+package com.my.teddy.bakery.game.baking.models
 
 /**
  * 인터랙션 판정 결과
@@ -11,9 +11,9 @@ enum class Judgement(val score: Int) {
 }
 
 /**
- * 판정 결과 (노트 정보 포함)
+ * 판정 결과 (동작 정보 포함)
  * 
- * @param noteId 판정된 노트의 ID
+ * @param noteId 판정된 동작의 ID
  * @param judgement 판정 결과
  */
 data class JudgementResult(

@@ -9,14 +9,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.my.teddy.bakery.ui.screens.bakery.BakeryScreen
 import com.my.teddy.bakery.ui.screens.result.ResultScreen
-import com.my.teddy.bakery.ui.screens.rhythm.RhythmGameScreen
+import com.my.teddy.bakery.ui.screens.baking.BakingGameScreen
 
 /**
  * 앱의 네비게이션 경로 정의
  */
 sealed class Screen(val route: String) {
     object Bakery : Screen("bakery")
-    object RhythmGame : Screen("rhythm_game")
+    object BakingGame : Screen("baking_game")
     object Result : Screen("result/{accuracy}/{coinsEarned}") {
         fun createRoute(accuracy: Float, coinsEarned: Int): String {
             return "result/$accuracy/$coinsEarned"
@@ -41,20 +41,20 @@ fun NavGraph(
         composable(Screen.Bakery.route) {
             BakeryScreen(
                 onStartBaking = {
-                    navController.navigate(Screen.RhythmGame.route)
+                    navController.navigate(Screen.BakingGame.route)
                 }
             )
         }
         
-        // 리듬 게임 화면
-        composable(Screen.RhythmGame.route) {
-            RhythmGameScreen(
+        // 빵 만들기 게임 화면
+        composable(Screen.BakingGame.route) {
+            BakingGameScreen(
                 onGameComplete = { accuracy, coinsEarned ->
                     navController.navigate(
                         Screen.Result.createRoute(accuracy, coinsEarned)
                     ) {
-                        // 리듬 게임 화면을 백스택에서 제거
-                        popUpTo(Screen.RhythmGame.route) {
+                        // 게임 화면을 백스택에서 제거
+                        popUpTo(Screen.BakingGame.route) {
                             inclusive = true
                         }
                     }
@@ -77,7 +77,7 @@ fun NavGraph(
                 accuracy = accuracy,
                 coinsEarned = coinsEarned,
                 onPlayAgain = {
-                    navController.navigate(Screen.RhythmGame.route) {
+                    navController.navigate(Screen.BakingGame.route) {
                         popUpTo(Screen.Bakery.route)
                     }
                 },
